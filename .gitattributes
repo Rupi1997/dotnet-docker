@@ -1,4 +1,6 @@
 # Set default behavior to automatically normalize line endings.
+Dockerfile merge=ours
+
 * text=auto
 
 *.doc  diff=astextplain
