@@ -31,6 +31,13 @@ namespace Microsoft.DotNet.Docker.Tests
                 return;
             }
 
+            if (imageData.IsArm && imageData.OS == OS.Jammy)
+            {
+                OutputHelper.WriteLine(
+                    "Skipping test due to https://github.com/dotnet/runtime/issues/66310. Re-enable when fixed.");
+                return;
+            }
+
             ImageScenarioVerifier verifier = new ImageScenarioVerifier(imageData, DockerHelper, OutputHelper, isWeb: true);
             await verifier.Execute();
         }
@@ -50,11 +57,6 @@ namespace Microsoft.DotNet.Docker.Tests
             if (imageData.Version.Major >= 5)
             {
                 variables.Add(RuntimeImageTests.GetRuntimeVersionVariableInfo(imageData, DockerHelper));
-            }
-
-            if (imageData.Version.Major == 6)
-            {
-                variables.Add(new EnvironmentVariableInfo("Logging__Console__FormatterName", "Json"));
             }
 
             base.VerifyCommonEnvironmentVariables(imageData, variables);

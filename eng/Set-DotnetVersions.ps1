@@ -37,7 +37,15 @@ param(
 
     # When set, only prints out an Azure DevOps variable with the value of the args to pass to update-dependencies.
     [Switch]
-    $PrintArgsVariableOnly
+    $PrintArgsVariableOnly,
+
+    # SAS query string used to access files in the binary blob container
+    [string]
+    $BinarySasQueryString,
+
+    # SAS query string used to access files in the checksum blob container
+    [string]
+    $ChecksumSasQueryString
 )
 
 $updateDepsArgs = @($ProductVersion)
@@ -62,9 +70,20 @@ if ($ComputeShas) {
     $updateDepsArgs += "--compute-shas"
 }
 
+if ($BinarySasQueryString) {
+    $updateDepsArgs += "--binary-sas=$BinarySasQueryString"
+}
+
+if ($ChecksumSasQueryString) {
+    $updateDepsArgs += "--checksum-sas=$ChecksumSasQueryString"
+}
+
 if ($UseStableBranding) {
     $updateDepsArgs += "--stable-branding"
 }
+
+$branch = & $PSScriptRoot/Get-Branch.ps1
+$updateDepsArgs += "--branch=$branch"
 
 if ($PrintArgsVariableOnly) {
     Write-Host "##vso[task.setvariable variable=updateDepsArgs]$updateDepsArgs"

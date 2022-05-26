@@ -3,15 +3,15 @@
 * `6` (Current)
   * `docker pull mcr.microsoft.com/dotnet/monitor:6`
 
-# About This Image
+# About
 
 This image contains the .NET Monitor tool.
 
 Use this image as a sidecar container to collect diagnostic information from other containers running .NET Core 3.1 or later processes.
 
-Watch [dotnet/announcements](https://github.com/dotnet/announcements/labels/Docker) for Docker-related .NET announcements.
+Watch [discussions](https://github.com/dotnet/dotnet-docker/discussions/categories/announcements) for Docker-related .NET announcements.
 
-# How to Use the Image
+# Usage
 
 The [.NET Docker samples](https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md) show various ways to use .NET and Docker together. See [Building Docker Images for .NET Applications](https://docs.microsoft.com/dotnet/core/docker/building-net-docker-images) to learn more.
 
@@ -43,27 +43,38 @@ See the [documentation](https://go.microsoft.com/fwlink/?linkid=2158052) for how
 ## Linux amd64 Tags
 Tags | Dockerfile | OS Version
 -----------| -------------| -------------
-6.1.0-alpine-amd64, 6.1-alpine-amd64, 6-alpine-amd64, 6.1.0-alpine, 6.1-alpine, 6-alpine, 6.1.0, 6.1, 6, latest | [Dockerfile](https://github.com/dotnet/dotnet-docker/blob/main/src/monitor/6.1/alpine/amd64/Dockerfile) | Alpine 3.14
-6.0.2-alpine-amd64, 6.0-alpine-amd64, 6.0.2-alpine, 6.0-alpine, 6.0.2, 6.0 | [Dockerfile](https://github.com/dotnet/dotnet-docker/blob/main/src/monitor/6.0/alpine/amd64/Dockerfile) | Alpine 3.14
+6.1.1-alpine-amd64, 6.1-alpine-amd64, 6-alpine-amd64, 6.1.1-alpine, 6.1-alpine, 6-alpine, 6.1.1, 6.1, 6, latest | [Dockerfile](https://github.com/dotnet/dotnet-docker/blob/main/src/monitor/6.1/alpine/amd64/Dockerfile) | Alpine 3.15
 
 ##### .NET Monitor Preview Tags
 Tags | Dockerfile | OS Version
 -----------| -------------| -------------
-7.0.0-preview.1-alpine-amd64, 7.0-alpine-amd64, 7-alpine-amd64, 7.0.0-preview.1-alpine, 7.0-alpine, 7-alpine, 7.0.0-preview.1, 7.0, 7 | [Dockerfile](https://github.com/dotnet/dotnet-docker/blob/main/src/monitor/7.0/alpine/amd64/Dockerfile) | Alpine 3.15
+7.0.0-preview.4-alpine-amd64, 7.0-alpine-amd64, 7-alpine-amd64, 7.0.0-preview.4-alpine, 7.0-alpine, 7-alpine, 7.0.0-preview.4, 7.0, 7 | [Dockerfile](https://github.com/dotnet/dotnet-docker/blob/main/src/monitor/7.0/alpine/amd64/Dockerfile) | Alpine 3.15
+
+## Linux arm64 Tags
+##### .NET Monitor Preview Tags
+Tags | Dockerfile | OS Version
+-----------| -------------| -------------
+7.0.0-preview.4-alpine-arm64v8, 7.0-alpine-arm64v8, 7-alpine-arm64v8, 7.0.0-preview.4-alpine, 7.0-alpine, 7-alpine, 7.0.0-preview.4, 7.0, 7 | [Dockerfile](https://github.com/dotnet/dotnet-docker/blob/main/src/monitor/7.0/alpine/arm64v8/Dockerfile) | Alpine 3.15
 
 You can retrieve a list of all available tags for dotnet/monitor at https://mcr.microsoft.com/v2/dotnet/monitor/tags/list.
 <!--End of generated tags-->
 
+*Tags not listed in the table above are not supported. See the [Supported Tags Policy](https://github.com/dotnet/dotnet-docker/blob/main/documentation/supported-tags.md)*
+
 # Support
 
-See [Microsoft Support for .NET](https://github.com/dotnet/core/blob/master/microsoft-support.md) for the support lifecycle.
+## Lifecycle
 
-# Image Update Policy
+* [Microsoft Support for .NET](https://github.com/dotnet/core/blob/main/microsoft-support.md)
+* [Supported Container Platforms Policy](https://github.com/dotnet/dotnet-docker/blob/main/documentation/supported-platforms.md)
+* [Supported Tags Policy](https://github.com/dotnet/dotnet-docker/blob/main/documentation/supported-tags.md)
+
+## Image Update Policy
 
 * We update the supported .NET images within 12 hours of any updates to their base images (e.g. debian:buster-slim, windows/nanoserver:ltsc2022, buildpack-deps:bionic-scm, etc.).
 * We publish .NET images as part of releasing new versions of .NET including major/minor and servicing.
 
-# Feedback
+## Feedback
 
 * [File an issue](https://github.com/dotnet/dotnet-docker/issues/new/choose)
 * [Contact Microsoft Support](https://support.microsoft.com/contactus/)

@@ -10,9 +10,9 @@ RUN powershell -Command " `
         $ProgressPreference = 'SilentlyContinue'; `
         `
         # Retrieve .NET Core SDK
-        $sdk_version = '3.1.416'; `
+        $sdk_version = '3.1.419'; `
         Invoke-WebRequest -OutFile dotnet.zip https://dotnetcli.azureedge.net/dotnet/Sdk/$sdk_version/dotnet-sdk-$sdk_version-win-x64.zip; `
-        $dotnet_sha512 = '489442ea1285933ac8dbdacf4978905f9e57957346cbc1c581dab6a86617d47a007cf469863d19cb56b1655bcc7cc99261b18a1219c4d7b2c933d98f31684930'; `
+        $dotnet_sha512 = '6fb9d6aeed88e8c9499230dbcd0bf5783c6741d0b5837867449057adfe300cc068caab9303361789441a079acd92b9cb7c73154187ece7fc4b210e2dfdbbca70'; `
         if ((Get-FileHash dotnet.zip -Algorithm sha512).Hash -ne $dotnet_sha512) { `
             Write-Host 'CHECKSUM VERIFICATION FAILED!'; `
             exit 1; `
@@ -22,9 +22,9 @@ RUN powershell -Command " `
         Remove-Item -Force dotnet.zip; `
         `
         # Install PowerShell global tool
-        $powershell_version = '7.0.8'; `
+        $powershell_version = '7.0.10'; `
         Invoke-WebRequest -OutFile PowerShell.Windows.x64.$powershell_version.nupkg https://pwshtool.blob.core.windows.net/tool/$powershell_version/PowerShell.Windows.x64.$powershell_version.nupkg; `
-        $powershell_sha512 = '9abc1ebbcfcf3eae492c3d569b0c2008aa5841b690d07e7fb1c42019ba2500f71680570beb3517d49aa0c5877fd4e5393854e32a8776c200cc35689e9dbb3261'; `
+        $powershell_sha512 = 'd7629fa6086eb02893f284d032eb0eff957617ad99465fb3970e212ef512e0188edb02a9ec34944b3bd1d3755b79ce9c7cdd6cb968933904a9f4ce9e20f3fa16'; `
         if ((Get-FileHash PowerShell.Windows.x64.$powershell_version.nupkg -Algorithm sha512).Hash -ne $powershell_sha512) { `
             Write-Host 'CHECKSUM VERIFICATION FAILED!'; `
             exit 1; `
@@ -41,7 +41,7 @@ RUN powershell -Command " `
             | Remove-Item -Force -Recurse"
 
 # SDK image
-FROM $REPO:3.1.22-nanoserver-20H2
+FROM $REPO:3.1.25-nanoserver-20H2
 
 ENV `
     # Unset ASPNETCORE_URLS from aspnet base image
