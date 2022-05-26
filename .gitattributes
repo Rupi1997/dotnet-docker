@@ -1,5 +1,4 @@
 # Set default behavior to automatically normalize line endings.
-##
 Dockerfile merge=foo
 
 * text=auto
