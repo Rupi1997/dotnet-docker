@@ -6,7 +6,10 @@
     set isFullMariner to defined(match(OS_VERSION, "^cbl-mariner\d+\.\d+$")) ^
     set isDistrolessMariner to defined(match(OS_VERSION, "^cbl-mariner\d+\.\d+-distroless$")) ^
     set isMariner to isFullMariner || isDistrolessMariner ^
+    set baseUrl to VARIABLES[cat("base-url|", dotnetVersion, "|", VARIABLES["branch"])] ^
+    set isInternal to find(baseUrl, "msrc") >= 0 || find(baseUrl, "internal") >= 0 ^
     set distrolessStagingDir to "/staging" ^
+    set marinerRepo to "mcr.microsoft.com/cbl-mariner" ^
     set baseImageRepo to when(isAlpine,
         cat(ARCH_VERSIONED, "/alpine"),
         when(isDebian,
@@ -14,13 +17,22 @@
             when(isUbuntu,
                 cat(ARCH_VERSIONED, "/ubuntu"),
                 when(isMariner,
-                    "cblmariner.azurecr.io/base/core",
+                    cat(marinerRepo, "/base/core"),
                     "<NOT-IMPLEMENTED>")))) ^
-    set baseImageTag to when(isAlpine || isMariner, OS_VERSION_NUMBER, OS_VERSION)
+    set baseImageTag to when(isAlpine || isMariner, OS_VERSION_NUMBER, OS_VERSION) ^
+    set isSingleStage to !isDistrolessMariner && !(isFullMariner && isInternal && ARCH_SHORT != "arm64") ^
+    set urlSuffix to when(isInternal, "SAS_QUERY_STRING", "") ^
+    set rpmFilename to "dotnet-runtime-deps.rpm"
 }}{{
-    if isDistrolessMariner:# Installer image
-}}FROM {{baseImageRepo}}:{{baseImageTag}}{{if isDistrolessMariner: AS installer}}
-{{ if isDistrolessMariner:
+    if !isSingleStage:# Installer image
+}}FROM {{baseImageRepo}}:{{baseImageTag}}{{if !isSingleStage: AS installer}}{{ if isInternal && isFullMariner && ARCH_SHORT != "arm64":
+
+RUN {{InsertTemplate("Dockerfile.download-runtime-deps-pkg",
+    [
+        "url-suffix": urlSuffix,
+        "filename": rpmFilename
+    ], "    ")}}}}
+{{ if isDistrolessMariner && find(OS_VERSION, "1.0") >= 0:
 RUN {{InsertTemplate("../Dockerfile.linux.install-pkgs",
     [
         "pkgs": ["dnf"]
@@ -31,12 +43,14 @@ RUN {{InsertTemplate("../Dockerfile.linux.install-pkgs",
     && }}{{InsertTemplate("../Dockerfile.linux.install-deps", ["distroless-staging-dir": distrolessStagingDir])}}
 {{ if isDistrolessMariner:
 # Create a non-root user and group
-RUN groupadd \
+RUN {{if find(OS_VERSION, "1.0") < 0:tdnf install -y shadow-utils \
+    && tdnf clean all \
+    && }}groupadd \
         --system \
-        --gid=1000 \
+        --gid={{if find(OS_VERSION, "1.0") >= 0:1000^else:101}} \
         app \
     && adduser \
-        --uid 1000 \
+        --uid {{if find(OS_VERSION, "1.0") >= 0:1000^else:101}} \
         --gid app \
         --shell /bin/false \
         --no-create-home \
@@ -54,17 +68,26 @@ RUN rm -rf {{distrolessStagingDir}}/etc/dnf \
 
 
 # .NET runtime-deps image
-FROM cblmariner.azurecr.io/distroless/minimal:{{OS_VERSION_NUMBER}}
+FROM {{marinerRepo}}/distroless/minimal:{{OS_VERSION_NUMBER}}
 
 COPY --from=installer {{distrolessStagingDir}}/ /
-^elif isFullMariner:
-# Install dotnet-runtime-deps package
-RUN dotnet_version={{VARIABLES[cat("runtime|", dotnetVersion, "|build-version")]}} \
-    && curl -fSL --output dotnet-runtime-deps.rpm {{VARIABLES[cat("base-url|", dotnetVersion, "|", VARIABLES["branch"])]}}/Runtime/$dotnet_version/dotnet-runtime-deps-$dotnet_version-cm.1-{{ARCH_SHORT}}.rpm \
-    && dotnet_sha512='{{VARIABLES[cat("runtime-deps-cm.1|", dotnetVersion, "|linux-rpm|", ARCH_SHORT, "|sha")]}}' \
-    && echo "$dotnet_sha512  dotnet-runtime-deps.rpm" | sha512sum -c - \
-    && rpm --install dotnet-runtime-deps.rpm \
-    && rm dotnet-runtime-deps.rpm
+^elif isFullMariner && ARCH_SHORT != "arm64":
+{{if isInternal:{{InsertTemplate("../Dockerfile.linux.copy-files",
+[
+    "files": [
+        [
+            "filename": rpmFilename
+        ]
+    ],
+    "srcStage": "installer",
+    "destination": ""
+])}}
+}}{{InsertTemplate("Dockerfile.install-runtime-deps-pkg",
+    [
+        "skip-download": isInternal
+        "url-suffix": urlSuffix,
+        "filename": rpmFilename
+    ])}}
 }}
 {{InsertTemplate("../Dockerfile.common-dotnet-envs") ^
 if isDistrolessMariner:

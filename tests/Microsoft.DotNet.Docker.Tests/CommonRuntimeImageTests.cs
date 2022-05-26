@@ -35,7 +35,8 @@ namespace Microsoft.DotNet.Docker.Tests
                 variables.AddRange(customVariables);
             }
 
-            if (imageData.OS.StartsWith(OS.AlpinePrefix))
+            if (imageData.OS.StartsWith(OS.AlpinePrefix) ||
+                (imageData.IsDistroless && imageData.OS != OS.Mariner10Distroless))
             {
                 variables.Add(new EnvironmentVariableInfo("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT", "true"));
             }
@@ -67,6 +68,12 @@ namespace Microsoft.DotNet.Docker.Tests
             if (!imageData.IsDistroless)
             {
                 OutputHelper.WriteLine("Skipping test for non-distroless platform.");
+                return;
+            }
+
+            if (imageData.OS == OS.Mariner20Distroless)
+            {
+                OutputHelper.WriteLine("Temporarily disable due to bash being installed. See https://github.com/dotnet/dotnet-docker/issues/3526");
                 return;
             }
 
